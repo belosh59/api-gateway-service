@@ -1,7 +1,7 @@
 package com.flatdeh.apigateway.service.impl;
 
 import com.flatdeh.apigateway.service.UserService;
-import com.flatdeh.apigateway.web.vo.UserVO;
+import com.flatdeh.apigateway.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -12,7 +12,7 @@ public class DefaultUserService implements UserService {
     private static final String USER = "/bets/lot/13";
 
     @Override
-    public Optional<UserVO> findByLogin(String login) {
+    public Optional<User> findByLogin(String login) {
         RestTemplate restTemplate = new RestTemplate();
 
         String result = restTemplate.getForObject(USER, String.class);
@@ -21,7 +21,7 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public Optional<UserVO> getUserByLogin(String userName) {
+    public Optional<User> getUserByLogin(String userName) {
         return Optional.empty();
     }
 }

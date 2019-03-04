@@ -1,11 +1,11 @@
 package com.flatdeh.apigateway.service;
 
-import com.flatdeh.apigateway.web.vo.UserVO;
+import com.flatdeh.apigateway.entity.User;
 
 import java.util.Optional;
 
 public interface UserService {
-    Optional<UserVO> findByLogin(String login);
+    Optional<User> findByLogin(String login);
 
-    Optional<UserVO> getUserByLogin(String userName);
+    Optional<User> getUserByLogin(String userName);
 }

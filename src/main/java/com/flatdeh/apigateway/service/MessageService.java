@@ -1,7 +1,7 @@
 package com.flatdeh.apigateway.service;
 
 import com.flatdeh.apigateway.web.vo.BetVO;
-import com.flatdeh.apigateway.web.vo.UserVO;
+import com.flatdeh.apigateway.entity.User;
 
 public interface MessageService {
 
@@ -9,5 +9,5 @@ public interface MessageService {
 
     void replyToCurrentUser(BetVO betVO);
 
-    void replyToUser(UserVO user, BetVO betVO);
+    void replyToUser(User user, BetVO betVO);
 }

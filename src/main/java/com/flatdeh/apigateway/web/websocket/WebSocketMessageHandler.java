@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flatdeh.apigateway.service.MessageService;
 import com.flatdeh.apigateway.service.BetService;
 import com.flatdeh.apigateway.web.vo.BetVO;
-import com.flatdeh.apigateway.web.vo.UserVO;
+import com.flatdeh.apigateway.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class WebSocketMessageHandler extends TextWebSocketHandler implements Mes
     protected void handleTextMessage(WebSocketSession session, TextMessage textMessage) throws Exception {
         String json = textMessage.getPayload();
         BetVO betVO = parseJson(json);
-        UserVO user = (UserVO) session.getAttributes().get("user");
+        User user = (User) session.getAttributes().get("user");
 
         if (user == null) {
             betVO.setSuccessfulBet(false);
@@ -61,18 +61,18 @@ public class WebSocketMessageHandler extends TextWebSocketHandler implements Mes
 
     @Override
     public void replyToCurrentUser(BetVO betVO) {
-        UserVO user = betVO.getUser();
+        User user = betVO.getUser();
         replyToUser(user, betVO);
     }
 
     @Override
-    public void replyToUser(UserVO user, BetVO betVO) {
+    public void replyToUser(User user, BetVO betVO) {
         logger.info("Replying to user: {}", user);
         String data = writeJson(betVO);
 
         Optional<WebSocketSession> targetClient = clients.stream()
             .filter(client -> {
-                UserVO userFromSession = (UserVO) client.getAttributes().get("user");
+                User userFromSession = (User) client.getAttributes().get("user");
                 if (userFromSession != null) {
                     return userFromSession.getId() == user.getId();
                 } else {

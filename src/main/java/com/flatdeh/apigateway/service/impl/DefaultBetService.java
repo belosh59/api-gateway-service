@@ -3,7 +3,7 @@ package com.flatdeh.apigateway.service.impl;
 import com.flatdeh.apigateway.service.BetService;
 import com.flatdeh.apigateway.service.MessageService;
 import com.flatdeh.apigateway.web.vo.BetVO;
-import com.flatdeh.apigateway.web.vo.UserVO;
+import com.flatdeh.apigateway.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -16,7 +16,7 @@ public class DefaultBetService implements BetService {
     @Override
     public void processBetRequest(BetVO betVO, MessageService client) {
         BetVO cachedBet = lotBetCache.get(betVO.getLotId());
-        UserVO user = betVO.getUser();
+        User user = betVO.getUser();
 
         if (cachedBet == null) {
             processSuccessfulBet(betVO);
@@ -38,7 +38,7 @@ public class DefaultBetService implements BetService {
             client.replyToCurrentUser(betVO);
 
         } else {
-            UserVO cachedUser = cachedBet.getUser();
+            User cachedUser = cachedBet.getUser();
             processSuccessfulBet(betVO);
             client.replyToAllUsers(betVO);
 

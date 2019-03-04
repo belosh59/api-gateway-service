@@ -1,7 +1,7 @@
 package com.flatdeh.apigateway.web.websocket;
 
 import com.flatdeh.apigateway.service.UserService;
-import com.flatdeh.apigateway.web.vo.UserVO;
+import com.flatdeh.apigateway.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.server.ServerHttpRequest;
@@ -27,7 +27,7 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
         if (principal != null) {
             String userName = principal.getName();
 
-            Optional<UserVO> userOptional = userService.getUserByLogin(userName);
+            Optional<User> userOptional = userService.getUserByLogin(userName);
             userOptional.ifPresent(user -> {
                 attributes.put("user", user);
                 logger.info("Connecting user: {}.", user.getLogin());

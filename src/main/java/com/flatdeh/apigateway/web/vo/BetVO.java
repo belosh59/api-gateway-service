@@ -1,5 +1,6 @@
 package com.flatdeh.apigateway.web.vo;
 
+import com.flatdeh.apigateway.entity.User;
 import lombok.Data;
 
 @Data
@@ -10,7 +11,7 @@ public class BetVO {
     private Double newCurrentPrice;
     private Double newBetPrice;
 
-    private UserVO user;
+    private User user;
 
     private String message;
     private boolean successfulBet;
