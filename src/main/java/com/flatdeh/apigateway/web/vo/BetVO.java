@@ -1,4 +1,4 @@
-package com.flatdeh.apigateway.web.websocket.vo;
+package com.flatdeh.apigateway.web.vo;
 
 import lombok.Data;
 
@@ -6,7 +6,7 @@ import lombok.Data;
 public class BetVO {
     private int lotId;
     private String lotName;
-    private Double betPrice;
+    private Double price;
     private Double newCurrentPrice;
     private Double newBetPrice;
 

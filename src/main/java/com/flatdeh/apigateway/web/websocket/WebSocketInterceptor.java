@@ -1,7 +1,7 @@
 package com.flatdeh.apigateway.web.websocket;
 
 import com.flatdeh.apigateway.service.UserService;
-import com.flatdeh.apigateway.web.websocket.vo.UserVO;
+import com.flatdeh.apigateway.web.vo.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.server.ServerHttpRequest;
@@ -32,7 +32,6 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
                 attributes.put("user", user);
                 logger.info("Connecting user: {}.", user.getLogin());
             });
-
         }
         return true;
     }

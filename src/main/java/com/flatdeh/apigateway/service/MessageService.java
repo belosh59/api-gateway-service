@@ -1,7 +1,7 @@
-package com.flatdeh.apigateway;
+package com.flatdeh.apigateway.service;
 
-import com.flatdeh.apigateway.web.websocket.vo.BetVO;
-import com.flatdeh.apigateway.web.websocket.vo.UserVO;
+import com.flatdeh.apigateway.web.vo.BetVO;
+import com.flatdeh.apigateway.web.vo.UserVO;
 
 public interface MessageService {
 

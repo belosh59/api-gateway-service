@@ -1,6 +1,6 @@
 package com.flatdeh.apigateway.service;
 
-import com.flatdeh.apigateway.web.websocket.vo.UserVO;
+import com.flatdeh.apigateway.web.vo.UserVO;
 
 import java.util.Optional;
 

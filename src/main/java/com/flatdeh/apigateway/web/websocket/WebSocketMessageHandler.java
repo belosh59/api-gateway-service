@@ -1,10 +1,10 @@
 package com.flatdeh.apigateway.web.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flatdeh.apigateway.MessageService;
+import com.flatdeh.apigateway.service.MessageService;
 import com.flatdeh.apigateway.service.BetService;
-import com.flatdeh.apigateway.web.websocket.vo.BetVO;
-import com.flatdeh.apigateway.web.websocket.vo.UserVO;
+import com.flatdeh.apigateway.web.vo.BetVO;
+import com.flatdeh.apigateway.web.vo.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
