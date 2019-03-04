@@ -1,16 +1,22 @@
 package com.flatdeh.apigateway.service.impl;
 
+import com.flatdeh.apigateway.entity.User;
 import com.flatdeh.apigateway.service.BetService;
 import com.flatdeh.apigateway.service.MessageService;
 import com.flatdeh.apigateway.web.vo.BetVO;
-import com.flatdeh.apigateway.entity.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class DefaultBetService implements BetService {
+    private static final String BET_SERVICE_URL = "http://localhost:8085/";
+    private RestTemplate restTemplate;
     private Map<Integer, BetVO> lotBetCache = new ConcurrentHashMap<>();
 
     @Override
@@ -19,9 +25,9 @@ public class DefaultBetService implements BetService {
         User user = betVO.getUser();
 
         if (cachedBet == null) {
-            processSuccessfulBet(betVO);
-            client.replyToAllUsers(betVO);
-
+            if (processSuccessfulBet(betVO)) {
+                client.replyToAllUsers(betVO);
+            }
         } else if (cachedBet.getPrice() > betVO.getPrice()) {
             betVO.setSuccessfulBet(false);
             betVO.setMessage("Кто-то сделал эту ставку до Вас. Попробуйте еще раз");
@@ -38,18 +44,32 @@ public class DefaultBetService implements BetService {
             client.replyToCurrentUser(betVO);
 
         } else {
-            User cachedUser = cachedBet.getUser();
-            processSuccessfulBet(betVO);
-            client.replyToAllUsers(betVO);
-
+            if (processSuccessfulBet(betVO)) {
+                User cachedUser = cachedBet.getUser();
+                client.replyToAllUsers(betVO);
 //            processBeatenUser(betVO, cachedUser);
-            betVO.setSuccessfulBet(false);
-            client.replyToUser(cachedUser, betVO);
+                betVO.setSuccessfulBet(false);
+                client.replyToUser(cachedUser, betVO);
+            }
         }
     }
 
-    private void processSuccessfulBet(BetVO betVO) {
+    private boolean processSuccessfulBet(BetVO betVO) {
+        ResponseEntity<String> response = restTemplate.postForEntity(BET_SERVICE_URL, betVO, String.class);
+        HttpStatus status = response.getStatusCode();
 
+        if (status == HttpStatus.OK) {
+            lotBetCache.put(betVO.getLotId(), betVO);
+            return true;
+        } else {
+            betVO.setSuccessfulBet(false);
+            betVO.setMessage("Во время ставки возникла ошибка!");
+            return false;
+        }
     }
 
+    @Autowired
+    public void setRestTemplate(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 }
