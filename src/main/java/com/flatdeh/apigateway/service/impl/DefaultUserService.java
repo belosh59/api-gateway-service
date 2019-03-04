@@ -1,7 +1,7 @@
 package com.flatdeh.apigateway.service.impl;
 
 import com.flatdeh.apigateway.service.UserService;
-import com.flatdeh.apigateway.web.websocket.vo.UserVO;
+import com.flatdeh.apigateway.web.vo.UserVO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
