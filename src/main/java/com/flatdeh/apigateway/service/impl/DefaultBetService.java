@@ -5,19 +5,24 @@ import com.flatdeh.apigateway.service.BetService;
 import com.flatdeh.apigateway.service.MessageService;
 import com.flatdeh.apigateway.web.vo.BetVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class DefaultBetService implements BetService {
-    private static final String BET_SERVICE_URL = "http://localhost:8085/";
+    private static final String BET_SERVICE = "bet-service";
     private RestTemplate restTemplate;
     private Map<Integer, BetVO> lotBetCache = new ConcurrentHashMap<>();
+    private DiscoveryClient discoveryClient;
 
     @Override
     public void processBetRequest(BetVO betVO, MessageService client) {
@@ -55,7 +60,10 @@ public class DefaultBetService implements BetService {
     }
 
     private boolean processSuccessfulBet(BetVO betVO) {
-        ResponseEntity<String> response = restTemplate.postForEntity(BET_SERVICE_URL, betVO, String.class);
+        List<ServiceInstance> clientInstances = discoveryClient.getInstances(BET_SERVICE);
+        URI uri = clientInstances.get(0).getUri();
+
+        ResponseEntity<String> response = restTemplate.postForEntity(uri, betVO, String.class);
         HttpStatus status = response.getStatusCode();
 
         if (status == HttpStatus.OK) {
@@ -71,5 +79,10 @@ public class DefaultBetService implements BetService {
     @Autowired
     public void setRestTemplate(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
+    }
+
+    @Autowired
+    public void setDiscoveryClient(DiscoveryClient discoveryClient) {
+        this.discoveryClient = discoveryClient;
     }
 }
