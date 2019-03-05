@@ -7,7 +7,7 @@ import lombok.Data;
 public class BetVO {
     private int lotId;
     private String lotName;
-    private Double price;
+    private Double betPrice;
     private Double newCurrentPrice;
     private Double newBetPrice;
 

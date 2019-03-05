@@ -41,6 +41,7 @@ public class WebSocketMessageHandler extends TextWebSocketHandler implements Mes
         String json = textMessage.getPayload();
         BetVO betVO = parseJson(json);
         User user = (User) session.getAttributes().get("user");
+        user=new User(); //todo: remove this
 
         if (user == null) {
             betVO.setSuccessfulBet(false);

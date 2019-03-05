@@ -28,12 +28,12 @@ public class DefaultBetService implements BetService {
             if (processSuccessfulBet(betVO)) {
                 client.replyToAllUsers(betVO);
             }
-        } else if (cachedBet.getPrice() > betVO.getPrice()) {
+        } else if (cachedBet.getBetPrice() > betVO.getBetPrice()) {
             betVO.setSuccessfulBet(false);
             betVO.setMessage("Кто-то сделал эту ставку до Вас. Попробуйте еще раз");
             client.replyToCurrentUser(betVO);
 
-        } else if (betVO.getPrice() > cachedBet.getPrice() * 1.05) {
+        } else if (betVO.getBetPrice() > cachedBet.getBetPrice() * 1.05) {
             betVO.setSuccessfulBet(false);
             betVO.setMessage("Вы не можете поднять ставку больше чем на 5%");
             client.replyToCurrentUser(betVO);
