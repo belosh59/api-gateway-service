@@ -74,11 +74,15 @@ public class DefaultBetService implements BetService {
         BetVO betVO = modelMapper.map(bet, BetVO.class);
         betVO.setPreviousBetUserId(cachedUserId);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(uri, betVO, String.class);
+        ResponseEntity<BetVO> response = restTemplate.postForEntity(uri, betVO, BetVO.class);
         HttpStatus status = response.getStatusCode();
 
         if (status == HttpStatus.OK) {
+            BetVO responseBetVO = response.getBody();
+            bet.setNewCurrentPrice(responseBetVO.getNewCurrentPrice());
+
             lotBetCache.put(bet.getLotId(), bet);
+            bet.setSuccessfulBet(true);
             return true;
         } else {
             bet.setSuccessfulBet(false);
