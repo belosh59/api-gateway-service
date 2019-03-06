@@ -1,7 +1,7 @@
 package com.flatdeh.apigateway.service;
 
-import com.flatdeh.apigateway.web.vo.BetVO;
+import com.flatdeh.apigateway.entity.Bet;
 
 public interface BetService {
-    void processBetRequest(BetVO betVO, MessageService client);
+    void processBetRequest(Bet betVO, MessageService client);
 }

@@ -1,9 +1,11 @@
 package com.flatdeh.apigateway.service.impl;
 
+import com.flatdeh.apigateway.entity.Bet;
 import com.flatdeh.apigateway.entity.User;
 import com.flatdeh.apigateway.service.BetService;
 import com.flatdeh.apigateway.service.MessageService;
 import com.flatdeh.apigateway.web.vo.BetVO;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -21,57 +23,64 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultBetService implements BetService {
     private static final String BET_SERVICE = "bet-service";
     private RestTemplate restTemplate;
-    private Map<Integer, BetVO> lotBetCache = new ConcurrentHashMap<>();
+    private Map<Integer, Bet> lotBetCache = new ConcurrentHashMap<>();
     private DiscoveryClient discoveryClient;
+    private ModelMapper modelMapper;
 
     @Override
-    public void processBetRequest(BetVO betVO, MessageService client) {
-        BetVO cachedBet = lotBetCache.get(betVO.getLotId());
-        User user = betVO.getUser();
+    public void processBetRequest(Bet bet, MessageService client) {
+        Bet cachedBet = lotBetCache.get(bet.getLotId());
+        User user = bet.getUser();
 
         if (cachedBet == null) {
-            if (processSuccessfulBet(betVO)) {
-                client.replyToAllUsers(betVO);
+            if (processSuccessfulBet(bet)) {
+                client.replyToAllUsers(bet);
             }
-        } else if (cachedBet.getBetPrice() > betVO.getBetPrice()) {
-            betVO.setSuccessfulBet(false);
-            betVO.setMessage("Кто-то сделал эту ставку до Вас. Попробуйте еще раз");
-            client.replyToCurrentUser(betVO);
+        } else if (cachedBet.getBetPrice() > bet.getBetPrice()) {
+            bet.setSuccessfulBet(false);
+            bet.setMessage("Кто-то сделал эту ставку до Вас. Попробуйте еще раз");
+            client.replyToCurrentUser(bet);
 
-        } else if (betVO.getBetPrice() > cachedBet.getBetPrice() * 1.05) {
-            betVO.setSuccessfulBet(false);
-            betVO.setMessage("Вы не можете поднять ставку больше чем на 5%");
-            client.replyToCurrentUser(betVO);
+        } else if (bet.getBetPrice() > cachedBet.getBetPrice() * 1.05) {
+            bet.setSuccessfulBet(false);
+            bet.setMessage("Вы не можете поднять ставку больше чем на 5%");
+            client.replyToCurrentUser(bet);
 
         } else if (cachedBet.getUser().getId() == user.getId()) {
-            betVO.setSuccessfulBet(false);
-            betVO.setMessage("Ваша ставка уже наивысшая.");
-            client.replyToCurrentUser(betVO);
+            bet.setSuccessfulBet(false);
+            bet.setMessage("Ваша ставка уже наивысшая.");
+            client.replyToCurrentUser(bet);
 
         } else {
-            if (processSuccessfulBet(betVO)) {
-                User cachedUser = cachedBet.getUser();
-                client.replyToAllUsers(betVO);
-//            processBeatenUser(betVO, cachedUser);
-                betVO.setSuccessfulBet(false);
-                client.replyToUser(cachedUser, betVO);
+            User cachedUser = cachedBet.getUser();
+            if (processSuccessfulBet(bet, cachedUser.getId())) {
+                client.replyToAllUsers(bet);
+                bet.setSuccessfulBet(false);
+                client.replyToUser(cachedUser, bet);
             }
         }
     }
 
-    private boolean processSuccessfulBet(BetVO betVO) {
+    private boolean processSuccessfulBet(Bet bet) {
+        return processSuccessfulBet(bet, 0);
+    }
+
+    private boolean processSuccessfulBet(Bet bet, int cachedUserId) {
         List<ServiceInstance> clientInstances = discoveryClient.getInstances(BET_SERVICE);
         URI uri = clientInstances.get(0).getUri();
+
+        BetVO betVO = modelMapper.map(bet, BetVO.class);
+        betVO.setPreviousBetUserId(cachedUserId);
 
         ResponseEntity<String> response = restTemplate.postForEntity(uri, betVO, String.class);
         HttpStatus status = response.getStatusCode();
 
         if (status == HttpStatus.OK) {
-            lotBetCache.put(betVO.getLotId(), betVO);
+            lotBetCache.put(bet.getLotId(), bet);
             return true;
         } else {
-            betVO.setSuccessfulBet(false);
-            betVO.setMessage("Во время ставки возникла ошибка!");
+            bet.setSuccessfulBet(false);
+            bet.setMessage("Ставка не принята! Во время обработки возникла ошибка!");
             return false;
         }
     }
@@ -84,5 +93,10 @@ public class DefaultBetService implements BetService {
     @Autowired
     public void setDiscoveryClient(DiscoveryClient discoveryClient) {
         this.discoveryClient = discoveryClient;
+    }
+
+    @Autowired
+    public void setModelMapper(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
     }
 }

@@ -1,13 +1,13 @@
 package com.flatdeh.apigateway.service;
 
-import com.flatdeh.apigateway.web.vo.BetVO;
+import com.flatdeh.apigateway.entity.Bet;
 import com.flatdeh.apigateway.entity.User;
 
 public interface MessageService {
 
-    void replyToAllUsers(BetVO betVO);
+    void replyToAllUsers(Bet betVO);
 
-    void replyToCurrentUser(BetVO betVO);
+    void replyToCurrentUser(Bet betVO);
 
-    void replyToUser(User user, BetVO betVO);
+    void replyToUser(User user, Bet betVO);
 }

@@ -3,7 +3,7 @@ package com.flatdeh.apigateway.web.websocket;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flatdeh.apigateway.service.MessageService;
 import com.flatdeh.apigateway.service.BetService;
-import com.flatdeh.apigateway.web.vo.BetVO;
+import com.flatdeh.apigateway.entity.Bet;
 import com.flatdeh.apigateway.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ public class WebSocketMessageHandler extends TextWebSocketHandler implements Mes
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage textMessage) throws Exception {
         String json = textMessage.getPayload();
-        BetVO betVO = parseJson(json);
+        Bet betVO = parseJson(json);
         User user = (User) session.getAttributes().get("user");
         user=new User(); //todo: remove this
 
@@ -55,19 +55,19 @@ public class WebSocketMessageHandler extends TextWebSocketHandler implements Mes
     }
 
     @Override
-    public void replyToAllUsers(BetVO betVO) {
+    public void replyToAllUsers(Bet betVO) {
         String data = writeJson(betVO);
         clients.forEach(client -> sendMessage(client, data));
     }
 
     @Override
-    public void replyToCurrentUser(BetVO betVO) {
+    public void replyToCurrentUser(Bet betVO) {
         User user = betVO.getUser();
         replyToUser(user, betVO);
     }
 
     @Override
-    public void replyToUser(User user, BetVO betVO) {
+    public void replyToUser(User user, Bet betVO) {
         logger.info("Replying to user: {}", user);
         String data = writeJson(betVO);
 
@@ -95,15 +95,15 @@ public class WebSocketMessageHandler extends TextWebSocketHandler implements Mes
         }
     }
 
-    private BetVO parseJson(String json) {
+    private Bet parseJson(String json) {
         try {
-            return objectMapper.readValue(json, BetVO.class);
+            return objectMapper.readValue(json, Bet.class);
         } catch (IOException e) {
             throw new RuntimeException("Unable to parse websocket json to BetVO", e);
         }
     }
 
-    private String writeJson(BetVO betVO) {
+    private String writeJson(Bet betVO) {
         try {
             return objectMapper.writeValueAsString(betVO);
         } catch (IOException e) {
