@@ -55,6 +55,8 @@ public class DefaultBetService implements BetService {
             User cachedUser = cachedBet.getUser();
             if (processSuccessfulBet(bet, cachedUser.getId())) {
                 client.replyToAllUsers(bet);
+
+                processBeatenUser(bet);
                 bet.setSuccessfulBet(false);
                 client.replyToUser(cachedUser, bet);
             }
@@ -83,6 +85,13 @@ public class DefaultBetService implements BetService {
             bet.setMessage("Ставка не принята! Во время обработки возникла ошибка!");
             return false;
         }
+    }
+
+    private void processBeatenUser(Bet bet) {
+        User user = bet.getUser();
+
+        String message = "Пользователь " + user.getLogin() + " перебил Вашу ставку на лот " + bet.getLotName();
+        bet.setMessage(message);
     }
 
     @Autowired
